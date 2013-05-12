@@ -46,7 +46,16 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
              return;
          }
 
-        $event->preventDefault();        
+        $event->preventDefault();   
+      
+          if(!$_POST['login']){
+            msg('missing login: please fill out all fields');
+            return;
+          }
+          else if(!$_POST['fullname']) {
+             msg('missing Real Name: please fill out all fields');
+            return;
+          }
          if($this->is_user($_REQUEST['login']))  return;  // name already taken
          if($this->getConf('captcha')) {
              $failed = false;
