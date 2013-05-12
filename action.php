@@ -1,6 +1,6 @@
 <?php
 /**
- * pregister plugin
+ * preregister plugin
  * registers users by means of a confirmation link 
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author     Myron Turner<turnermm02@shaw.ca>
