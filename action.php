@@ -1,7 +1,6 @@
 <?php
 /**
- * preregister plugin
- * registers users by means of a confirmation link 
+ * registers users by means of a confirmation link
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author     Myron Turner<turnermm02@shaw.ca>
  */
@@ -32,21 +31,22 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
    function allow_preregister_check(&$event, $param) {
     $act = $this->_act_clean($event->data);    
     if($act != 'preregistercheck') return; 
+  
     $event->preventDefault();
   }
  
     function process_preregister_check(&$event, $param) {
          global $ACT;
+      
          if($ACT != 'preregistercheck') return; 
          if($_GET && $_GET['prereg']) {
-             echo "Registering: " . $_GET['prereg'];
+             echo $this->getLang('registering') . $_GET['prereg'];
              $this->process_registration($_GET['prereg']);
              $event->preventDefault();
              return;
          }
 
-        $event->preventDefault();
-        
+        $event->preventDefault();        
          if($this->is_user($_REQUEST['login']))  return;  // name already taken
          
          $failed = false;
@@ -57,21 +57,19 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
                  break;                
              }
           }
-         if($failed) {
-             echo "<h4>Your Selections do not match the cards; please try again.</h4>";
+         if($failed) {    
+             echo '<h4>'. $this->getLang('cards_nomatch') . '</h4>';
              return;
         }
-
+ 
         $t = time();
         $index = md5($t);
         $url = DOKU_URL . 'doku.php?' . $_REQUEST['id']. '&do=preregistercheck&prereg='. $index;    
         
         if($this->send_link($_REQUEST['email'], $url) ) {
-            echo "An email with a confirmation link has been sent to your email address.  Either click on that link or paste it "
-              . " into your browser.  You will then be registered and will receive your password. ";
+          echo $this->getLang('confirmation');
         }
-        else echo "A problem occurred in sending your confirmation link to your email address. You might try again later.";
-          
+        else echo $this->getLang('email_problem');          
         
           $data = unserialize(io_readFile($this->metaFn,false)); 
           if(!$data) $data = array();          
@@ -107,6 +105,10 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     function process_registration($index) {
 
            $data = unserialize(io_readFile($this->metaFn,false)); 
+           if(!isset($data[$index])) {
+              msg($this->getLang('old_confirmation'));
+              return;
+           }
            $post = $data[$index];
            $post['save'] = 1;
            $_POST= array_merge($post, array());
@@ -187,7 +189,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     function send_link($email, $url) {  
         
         if(!mail_isvalid($email)) {
-             msg("Invalid email address: $email");
+             msg($this->getLang('bad_email') . $email);
              return false; 
         } 
      
@@ -211,7 +213,7 @@ function is_user($uname) {
         if($line{0} == '#') continue;
         list($user,$rest) = preg_split('/:/',$line,2);
         if($uname == $user) {
-           msg("userid $user is already in use",-1);
+           msg($this->getLang('uid_inuse') . $user,-1);
            return true;
         }      
     }
