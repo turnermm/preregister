@@ -1,0 +1,7 @@
+base  preregister
+author  Myron Turner
+email  turnermm02@shaw.ca
+date  2013-05-12
+name  preregister
+desc  Additional confirmation layer for new registrations
+url  
