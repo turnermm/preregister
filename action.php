@@ -48,29 +48,37 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
 
         $event->preventDefault();        
          if($this->is_user($_REQUEST['login']))  return;  // name already taken
-         
-         $failed = false;
-         if(!isset($_REQUEST['card'])) return;
-         foreach($_REQUEST['card'] as $card) {          
-             if(strpos($_REQUEST['sel'],$card) === false) {
-                 $failed = true;
-                 break;                
-             }
-          }
-         if($failed) {    
-             echo '<h4>'. $this->getLang('cards_nomatch') . '</h4>';
-             return;
+         if($this->getConf('captcha')) {
+             $failed = false;
+             if(!isset($_REQUEST['card'])) return;
+             foreach($_REQUEST['card'] as $card) {          
+                 if(strpos($_REQUEST['sel'],$card) === false) {
+                     $failed = true;
+                     break;                
+                 }
+              }
+             if($failed) {    
+                 echo '<h4>'. $this->getLang('cards_nomatch') . '</h4>';
+                 return;
+            }
         }
- 
         $t = time();
         $index = md5($t);
         $url = DOKU_URL . 'doku.php?' . $_REQUEST['id']. '&do=preregistercheck&prereg='. $index;    
-        
-        if($this->send_link($_REQUEST['email'], $url) ) {
-          echo $this->getLang('confirmation');
+        if($this->getConf('send_confirm')) {        
+            $valid_email = true;
+            if($this->send_link($_REQUEST['email'], $url,$valid_email) ) {
+              echo $this->getLang('confirmation');
+            }
+            else if($valid_email) {
+                echo $this->getLang('email_problem'); 
+            }
         }
-        else echo $this->getLang('email_problem');          
-        
+        else {
+           echo "<a href='$url'>$url</a><br /><br />\n";
+           echo $this->getLang('screen_confirm');
+        }  
+   
           $data = unserialize(io_readFile($this->metaFn,false)); 
           if(!$data) $data = array();          
           $data[$index] = $_POST;
@@ -94,11 +102,13 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         }    
         $pos = $event->data->findElementByAttribute('type','submit');       
         if(!$pos) return; // no button -> source view mode
-        $cards = $this-> get_cards();
-        $sel ="";
-        $out = $this->format_cards($cards,$sel);        
-        $event->data->_hidden['sel'] = implode("",$sel);      
-        $event->data->insertElement($pos++,$out);
+        if($this->getConf('captcha')) {        
+            $cards = $this-> get_cards();
+            $sel ="";
+            $out = $this->format_cards($cards,$sel);                
+            $event->data->_hidden['sel'] = implode("",$sel);      
+           $event->data->insertElement($pos++,$out);
+        }   
     }
     
 
@@ -186,10 +196,11 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     }
     
     
-    function send_link($email, $url) {  
+    function send_link($email, $url, &$valid_email) {  
         
         if(!mail_isvalid($email)) {
              msg($this->getLang('bad_email') . $email);
+             $valid_email = false;
              return false; 
         } 
      

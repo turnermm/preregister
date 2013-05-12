@@ -8,3 +8,4 @@ $lang['cards_nomatch'] = "Your Selections do not match the cards; please try aga
 $lang['confirmation'] ="An email with a confirmation link has been sent to your email address.  Either click on that link or paste it "
               . " into your browser.  You will then be registered and will receive your password. ";
 $lang['email_problem'] ="A problem occurred in sending your confirmation link to your email address. You might try again later.";
+$lang['screen_confirm'] = "Click on the above link to confirm your registration. You will then be sent an email with  your password.";
