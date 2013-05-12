@@ -205,10 +205,12 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         } 
      
         global $conf;
-        $text = "Either click on this link or paste it into your browser to complete your registration:\n\n";
+        
+        $text = $this->getLang('email_confirm')  . "\n\n";
         $text .= $url;
         $text .= "\n\n";      
-        return mail_send($email, "Confirmation Link from: " . $conf['title'],$text, "root@localhost");
+        $subject =$this->getLang('subject_confirm');
+        return mail_send($email, $subject . $conf['title'],$text, "root@localhost");
         
 }
 
@@ -223,6 +225,7 @@ function is_user($uname) {
         $line = trim($line);
         if($line{0} == '#') continue;
         list($user,$rest) = preg_split('/:/',$line,2);
+        if(!trim($user)) continue;
         if($uname == $user) {
            msg($this->getLang('uid_inuse') . $user,-1);
            return true;
