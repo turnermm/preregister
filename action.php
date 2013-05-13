@@ -17,6 +17,8 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
      * register the eventhandlers
      */
     private $metaFn;
+    private $captcha;
+    
     function register(&$controller){
             $controller->register_hook('HTML_REGISTERFORM_OUTPUT', 'BEFORE', $this, 'update_register_form');
             $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE',  $this, 'allow_preregister_check');
@@ -26,12 +28,12 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     function __construct() {       
        $metafile= 'preregister:db';
        $this->metaFn = metaFN($metafile,'.ser');
+       $this->check_captcha_selection();       
     }
         
    function allow_preregister_check(&$event, $param) {
     $act = $this->_act_clean($event->data);    
     if($act != 'preregistercheck') return; 
-  
     $event->preventDefault();
   }
  
@@ -56,8 +58,16 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
              msg('missing Real Name: please fill out all fields');
             return;
           }
+
+        if($this->captcha =='captcha') {         
+            $captcha = $this->loadHelper('captcha', true);
+            if(!$captcha->check()) {
+               return;
+            }
+        }
+         
          if($this->is_user($_REQUEST['login']))  return;  // name already taken
-         if($this->getConf('captcha')) {
+         if($this->captcha == 'builtin') {
              $failed = false;
              if(!isset($_REQUEST['card'])) return;
              foreach($_REQUEST['card'] as $card) {          
@@ -111,7 +121,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         }    
         $pos = $event->data->findElementByAttribute('type','submit');       
         if(!$pos) return; // no button -> source view mode
-        if($this->getConf('captcha')) {        
+        if($this->captcha == 'builtin') {        
             $cards = $this-> get_cards();
             $sel ="";
             $out = $this->format_cards($cards,$sel);                
@@ -139,6 +149,28 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     }
 
  
+    function check_captcha_selection() {
+       $list = plugin_list();
+       $this->captcha = $this->getConf('captcha');     
+       if(!in_array('captcha', $list)) {
+           if(preg_match("/captcha/", $this->captcha)) {                           
+               $this->captcha = 'builtin';
+           }
+           return;
+       }    
+     
+       if($this->captcha == 'none' || $this->captcha == 'builtin')  { 
+           echo '<style type = "text/css">#plugin__captcha_wrapper{ display:none; } </style>';
+           return;
+       }
+      if(plugin_isdisabled('captcha')) {
+          $this->captcha = 'builtin';
+          return;             
+      }
+      $this->captcha ='captcha';     
+       
+    }
+    
     /**
      * Pre-Sanitize the action command
      *
