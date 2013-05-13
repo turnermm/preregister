@@ -69,7 +69,10 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
          if($this->is_user($_REQUEST['login']))  return;  // name already taken
          if($this->captcha == 'builtin') {
              $failed = false;
-             if(!isset($_REQUEST['card'])) return;
+             if(!isset($_REQUEST['card'])) {
+               echo '<h4>'. $this->getLang('cards_nomatch') . '</h4>';
+               return;
+             }
              foreach($_REQUEST['card'] as $card) {          
                  if(strpos($_REQUEST['sel'],$card) === false) {
                      $failed = true;
