@@ -49,7 +49,9 @@ class admin_plugin_preregister extends DokuWiki_Admin_Plugin {
      * output appropriate html
      */
     function html() {
-     // ptln('<pre>'.$this->output.'</pre>');
+    ptln('<a href="javascript:prereg_Inf.toggle();void 0"><span style="line-height: 175%">Toggle info</span></a><br />');
+     ptln('<div id="prereg_info" style="border: 1px solid silver; padding:4px;">'.     $this->locale_xhtml('info') . '</div><br>' );
+    
       
       ptln('<form action="'.wl($ID).'" method="post">');
       
@@ -63,7 +65,7 @@ class admin_plugin_preregister extends DokuWiki_Admin_Plugin {
       echo $this->getConfirmList();    
       ptln('</div>');
       ptln('</form>');
-
+      $this->js();  
     }
  
     function getConfirmList() {
@@ -124,5 +126,24 @@ class admin_plugin_preregister extends DokuWiki_Admin_Plugin {
         }        
  
         io_saveFile($this->metaFn,serialize($data));
+    }
+    function js() {
+echo <<<SCRIPT
+<script type="text/javascript">
+    //<![CDATA[    
+var prereg_Inf = {
+dom_style: document.getElementById('prereg_info').style,
+open: function() { this.dom_style.display = 'block'; },
+close: function() { this.dom_style.display = "none"; },
+toggle: function() { 
+if(this.is_open) { this.close(); this.is_open=false; return; }
+this.open(); this.is_open=true;
+},
+is_open: true,
+};    
+    //]]>
+ </script>
+SCRIPT;
+
     }
 }

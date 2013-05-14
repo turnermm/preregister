@@ -1,0 +1,10 @@
+====Info====
+If you are satisfied that you want to delete the listed items from the data file, click on the ''Confirm deletions'' button.  The ''age
+column'' is the length of time that the entry has been in the datafile. Only those entries which are greater than the ''list_age'' setting 
+are listed here.  You can change the ''list_age'' setting  in the Configuration Manager.
+
+Dokuwiki saves it files as readable by all. The ''Secure data file'' button will change that so that the data file can be read only
+by the web server, if your web server supports this feature.
+
+
+
