@@ -23,6 +23,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
             $controller->register_hook('HTML_REGISTERFORM_OUTPUT', 'BEFORE', $this, 'update_register_form');
             $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE',  $this, 'allow_preregister_check');
             $controller->register_hook('TPL_ACT_UNKNOWN', 'BEFORE',  $this, 'process_preregister_check');     
+            $controller->register_hook('TPL_METAHEADER_OUTPUT', 'AFTER', $this, 'metaheaders_after');
      }
     
     function __construct() {       
@@ -30,6 +31,14 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
        $this->metaFn = metaFN($metafile,'.ser');
        $this->check_captcha_selection();       
     }
+    function metaheaders_after (&$event, $param) {   
+         if($this->captcha == 'none' || $this->captcha == 'builtin')  { 
+            ptln( "\n<style type='text/css'>\n   /*<![CDATA[*/");
+            ptln("#plugin__captcha_wrapper{ display:none; }\n   /*]]>*/\n</style>");
+         }   
+
+    }    
+    
         
    function allow_preregister_check(&$event, $param) {
     $act = $this->_act_clean($event->data);    
@@ -161,9 +170,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
            }
            return;
        }    
-     
        if($this->captcha == 'none' || $this->captcha == 'builtin')  { 
-           echo '<style type = "text/css">#plugin__captcha_wrapper{ display:none; } </style>';
            return;
        }
       if(plugin_isdisabled('captcha')) {
