@@ -32,6 +32,9 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
        $this->check_captcha_selection();       
     }
     function metaheaders_after (&$event, $param) {   
+         global $ACT;
+         if($ACT !== 'register') return;        
+         
          if($this->captcha == 'none' || $this->captcha == 'builtin')  { 
             ptln( "\n<style type='text/css'>\n   /*<![CDATA[*/");
             ptln("#plugin__captcha_wrapper{ display:none; }\n   /*]]>*/\n</style>");
