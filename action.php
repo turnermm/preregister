@@ -129,7 +129,8 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         $event->data->_hidden['do'] = 'preregistercheck';
  
         for($i=0; $i <count($event->data->_content); $i++) {
-            if($event->data->_content[$i]['type'] == 'submit') {
+            if(isset($event->data->_content[$i]['type']) && $event->data->_content[$i]['type'] == 'submit') 
+            {   
                 $event->data->_content[$i]['value'] = 'Submit';
                 break; 
             }
