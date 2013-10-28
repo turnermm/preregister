@@ -1,0 +1,3 @@
+====Info====
+Wenn Sie die aufgeführten Punkte aus der Datei löschen wollen, klicken Sie bitten den Bestätigen-Button. Die Spalte "Alter" ist die Zeit, wie lange ein Eintrag bereits in der Datei ist. 
+Nur die Einträge, die älter als die gewählte Einstellung sind, werden hier angezeigt. Sie können diese Einstellung im Konfigurations-Manager ändern.
