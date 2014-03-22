@@ -1,0 +1,4 @@
+====Info====
+Weet u zeker dat u wilt verwijderen? Klik dan op "Bevestig verwijderen".  De "age column" is het tijdbestek dat de gegevens in het databestand staan. Alleen gegevens die groter zijn dan de "list_age" instelling worden getoond. De "list_age" instelling kan worden gewijzigd in de Configuratie Manager. 
+
+Dokuwiki bewaart bestanden als leesbaar voor allen. De "Beveiligd bestand" knop maakt het bestand alleen lezen voor de web server, mits ondersteund door deze.  
