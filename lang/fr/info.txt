@@ -1,0 +1,5 @@
+==== Informations ====
+
+Si vous êtes certain de vouloir supprimer du fichier de données les articles listés, cliquez sur le bouton ''Confirmer les suppressions''. La colonne ''age'' représente la durée pendant laquelle la donnée s'est trouvée dans le fichier. Seules les articles qui ont un age supérieur au paramètre "list_age" sont affichés ici. Vous pouvez changer ce paramètre dans le gestionnaire de configuration.
+
+DokuWiki enregistre ce fichier en lecture pour tous. Le bouton ''Sécuriser le fichier de données'' change cela de telle sorte que le fichier de données ne soit lisible que par le serveur web, si votre serveur web comprend ce mécanisme.
