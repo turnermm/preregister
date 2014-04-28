@@ -156,7 +156,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
            }
            $post = $data[$index];
            $post['save'] = 1;
-           $_POST= array_merge($post, array());
+           $_POST= array_merge($post, array());           
            if(register()) {
               unset($data[$index]);
               io_saveFile($this->metaFn,serialize($data));
