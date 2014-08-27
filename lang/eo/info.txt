@@ -1,0 +1,4 @@
+====Info====
+Se vi certas ke vi volas forigi la listitajn erojn el la datumar-dosiero, klaku sur la butono "Konfirmi forigojn". La "aĝa kolumno" estas kvanto da tempo la ero estas en la datumardosiero. Nur tiuj eroj kiuj estas pli malnovaj ol la difino de "list_aĝo" estas listitaj ĉi tie. Vi povas ŝanĝi la difino de "list_aĝo" en la Agordilo.
+
+Dokuwiki konservas siajn dosieroj kiel legeblaj por ĉiuj. La butono "Sekuri datumaran dosieron" ŝanĝos tion, tiel ke la datumardosiero povas esti nurlegebla de la retservilo, se via servilo subtenas tion.
