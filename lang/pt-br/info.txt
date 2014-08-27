@@ -1,0 +1,4 @@
+====Info====
+Se você está certo que quer apagar os itens listados do arquivo de dados, clique no botão "Confirmar exclusões". A "coluna idade" é o tempo que a entrada está esperando no arquivo de dados. Somente aquelas entradas com valor maior que a definição de "list_age" são listadas aqui. Você pode mudar a definição de "list_age" no Administrador de Configurações.
+
+Dokuwiki salva seus arquivos como legíveis para todos. O botão "Segurança para arquivo de dados" muda isso de forma que o arquivo de dados poderáo ser lido somente pelo servidor web, se o mesmo suportar esta ação.
