@@ -19,3 +19,4 @@ $lang['menu']                  = 'Purigi konfirm-liston de Preregister';
 $lang['btn_confirm']           = 'Konfirmi forigojn';
 $lang['btn_secure']            = 'Sekuri datumaran dosieron';
 $lang['invalid']               = 'malvalida enigo estis detektata!';
+$lang['check_matching']        = 'Marku la kongruajn kart-bildojn';
