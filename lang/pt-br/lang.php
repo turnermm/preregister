@@ -19,3 +19,4 @@ $lang['menu']                  = 'Limpar lista de confirmação do Preregister';
 $lang['btn_confirm']           = 'Confirmar exclusões';
 $lang['btn_secure']            = 'Segurança para arquivo de dados';
 $lang['invalid']               = 'entrada inválida foi detectada!';
+$lang['check_matching']        = 'Marque as cartas indicadas';
