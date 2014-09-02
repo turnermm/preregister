@@ -17,3 +17,4 @@ $lang['btn_confirm'] = 'Confirm deletions';
 $lang['btn_secure'] = 'Secure data file';
 
 $lang['invalid'] = 'invalid input detected!';
+$lang['check_matching'] = 'Check off the matching cards';

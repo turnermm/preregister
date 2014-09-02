@@ -210,7 +210,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         $new_row = (int)(count($cards)/2);
         $out = $sel[0] . '&nbsp;&nbsp;' . $sel[1] . '&nbsp;&nbsp;' . $sel[2] . '<br />';
         $out = str_replace(array('H','S','D','C'),array('&#9829;','&#9824;','&#9830;','&#9827;'),$out);
-        $out = "Check off the matching cards<br />" . $out;
+        $out = $this->getLang('check_matching'). '<br />' . $out;
         $out .= '<center><table cellspacing="2"><tr>';
         $i=0;
         foreach($cards as $card) {
