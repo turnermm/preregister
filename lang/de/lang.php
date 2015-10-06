@@ -2,9 +2,10 @@
 
 /**
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
- * 
+ *
  * @author Matthias Schulte <dokuwiki@lupo49.de>
  * @author Egmont Schreiter <egmont.schreiter@gmx.de>
+ * @author Carsten Perthel <carsten@cpesoft.com>
  */
 $lang['old_confirmation']      = 'Diese Bestätigungs-ID ist nicht mehr gültig. Der Benutzer wurde ggf. bereits angelegt.';
 $lang['bad_email']             = 'Ungültige E-Mail-Adresse:';
@@ -20,3 +21,4 @@ $lang['menu']                  = 'Löschen der Preregister-Bestätigungsliste';
 $lang['btn_confirm']           = 'Löschen bestätigen';
 $lang['btn_secure']            = 'Sicherheitsdatei';
 $lang['invalid']               = 'Ungültige Eingabe erkannt!';
+$lang['check_matching']        = 'Bitte die passenden Karten auswählen';
