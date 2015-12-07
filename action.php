@@ -10,6 +10,7 @@ if(!defined('DOKU_INC')) die();
 
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'action.php');
+require_once(DOKU_INC. 'inc/auth.php');
 
 class action_plugin_preregister extends DokuWiki_Action_Plugin {
 
@@ -99,7 +100,8 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
             }
         }
         $t = time();
-        $index = md5($t);
+        $salt =  auth_cookiesalt();       
+        $index = md5(microtime() .  $salt);
         $url = DOKU_URL . 'doku.php?' . htmlentities($INPUT->str('id')). '&do=preregistercheck&prereg='. $index;    
         if($this->getConf('send_confirm')) {        
             $valid_email = true;
