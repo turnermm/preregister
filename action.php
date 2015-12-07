@@ -50,12 +50,14 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
   }
  
     function process_preregister_check(&$event, $param) {
-         global $ACT;
+         global $ACT, $INPUT;
       
          if($ACT != 'preregistercheck') return; 
-         if($_GET && $_GET['prereg']) {
-             echo $this->getLang('registering') . $_GET['prereg'];
-             $this->process_registration($_GET['prereg']);
+         if($_GET && $_GET['prereg']) {             
+             $md5= $INPUT->str('prereg');
+             if(!preg_match("/^(\w){32}$/",$md5,$matches)) return;;
+             echo $this->getLang('registering') . $md5;
+             $this->process_registration($md5);
              $event->preventDefault();
              return;
          }
@@ -98,7 +100,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         }
         $t = time();
         $index = md5($t);
-        $url = DOKU_URL . 'doku.php?' . $_REQUEST['id']. '&do=preregistercheck&prereg='. $index;    
+        $url = DOKU_URL . 'doku.php?' . htmlentities($INPUT->str('id')). '&do=preregistercheck&prereg='. $index;    
         if($this->getConf('send_confirm')) {        
             $valid_email = true;
             if($this->send_link($_REQUEST['email'], $url,$valid_email) ) {
