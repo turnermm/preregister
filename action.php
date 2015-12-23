@@ -264,14 +264,13 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         } 
      
         $text = $this->getLang('email_confirm')  . "\n\n";
-        $text .= $url;
-        $text .= "\n\n";      
+        $text .= "@URL@\n\n";      
         $subject =$this->getLang('subject_confirm');
         
         $mail = new Mailer();
         $mail->to($email);
         $mail->subject($subject);
-        $mail->setBody($text);
+        $mail->setBody($text, array('url'=>$url));
         return $mail->send();
 }
 
