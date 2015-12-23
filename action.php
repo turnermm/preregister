@@ -263,14 +263,16 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
              return false; 
         } 
      
-        global $conf;
-        
         $text = $this->getLang('email_confirm')  . "\n\n";
         $text .= $url;
         $text .= "\n\n";      
         $subject =$this->getLang('subject_confirm');
-        return mail_send($email, $subject . $conf['title'],$text, $conf['mailfrom']);
         
+        $mail = new Mailer();
+        $mail->to($email);
+        $mail->subject($subject);
+        $mail->setBody($text);
+        return $mail->send();
 }
 
 function is_user($uname) {
