@@ -20,7 +20,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     private $metaFn;
     private $captcha;
     
-    function register(&$controller){
+    function register(Doku_Event_Handler $controller){
             $controller->register_hook('HTML_REGISTERFORM_OUTPUT', 'BEFORE', $this, 'update_register_form');
             $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE',  $this, 'allow_preregister_check');
             $controller->register_hook('TPL_ACT_UNKNOWN', 'BEFORE',  $this, 'process_preregister_check');     
