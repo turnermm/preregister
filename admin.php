@@ -16,7 +16,7 @@ class admin_plugin_preregister extends DokuWiki_Admin_Plugin {
     var $output = '';
     private $metaFn;
     
-     function __construct() {       
+    function __construct() {       
        $metafile= 'preregister:db';
        $this->metaFn = metaFN($metafile,'.ser');
     }
@@ -80,7 +80,8 @@ class admin_plugin_preregister extends DokuWiki_Admin_Plugin {
            }
         }
         
-        $data = unserialize(io_readFile($this->metaFn,false)); 
+        $data = unserialize(io_readFile($this->metaFn,false));
+        if (!is_array($data)) $data = array();
         $hidden = array();
         $result = "<table cellspacing='2'><th>login</th><th>email</th><th>name</th><th>save time</th><th>age</th>";
         $current_time = time();
@@ -104,7 +105,7 @@ class admin_plugin_preregister extends DokuWiki_Admin_Plugin {
         }
         return $result ."\n";      
     }
-    
+
     function secure_datafile() {
          $perm = substr(sprintf('%o', fileperms($this->metaFn )), -4);         
          if(preg_match('/\d\d(\d)/',$perm,$matches)) {   
@@ -117,16 +118,19 @@ class admin_plugin_preregister extends DokuWiki_Admin_Plugin {
              }
          }
     }
+
     function prune_datafile($which) {
-        $data = unserialize(io_readFile($this->metaFn,false)); 
+        $data = unserialize(io_readFile($this->metaFn,false));
+        if (!is_array($data)) $data = array();
         foreach($data as $index=>$entry) {
             if(in_array($index,$which)) {
                  unset($data[$index]);
-            }            
-        }        
- 
+            }
+        }
+
         io_saveFile($this->metaFn,serialize($data));
     }
+
     function js() {
 echo <<<SCRIPT
 <script type="text/javascript">
