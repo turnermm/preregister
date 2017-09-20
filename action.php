@@ -19,7 +19,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
      */
     private $metaFn;
     private $captcha;
-    private $captchaPlugins = array('captcha', 'recaptcha2');
+    private $captchaPlugins = array('none', 'builtin', 'captcha', 'recaptcha2');
     
     function register(Doku_Event_Handler $controller){
             $controller->register_hook('HTML_REGISTERFORM_OUTPUT', 'BEFORE', $this, 'update_register_form');
@@ -182,20 +182,23 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     }
     
     function check_captcha_selection() {
-        $list = plugin_list();
-        $this->captcha = explode(" plugin", $this->getConf('captcha'))[0];
+        $pattern = "/(?<selection>" . join("|", $this->captchaPlugins) . ")/";
         
-        if($this->captcha == 'none' || $this->captcha == 'builtin')  {
-            return;
-        }
-        
-        if(    in_array($this->captcha, $this->captchaPlugins)
-            && in_array($this->captcha, $list)
-            && !plugin_isdisabled($this->captcha)) {
+        if(preg_match($pattern, $this->getConf('captcha'), $matches))
+        {
+            $this->captcha = $matches['selection'];
             
-            return;
+            if($this->captcha == 'none' || $this->captcha == 'builtin')  {
+                return;
+            }
+            
+            $installedPlugins = plugin_list();
+            if(in_array($this->captcha, $installedPlugins) && !plugin_isdisabled($this->captcha)) {
+                return;
+            }
         }
         
+        // Plugin was disabled or bad config value; default to 'builtin'
         $this->captcha ='builtin';
     }
     
