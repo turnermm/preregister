@@ -5,7 +5,6 @@ $lang['uid_inuse'] = "userid is already in use: ";
 
 $lang['registering'] ="Registering: ";
 $lang['cards_nomatch'] = "Your Selections do not match the cards; please try again.";
-$lang['captcha_failed'] = "Please complete the CAPTCHA correctly to continue.";
 $lang['confirmation'] ="An email with a confirmation link has been sent to your email address.  Either click on that link or paste it "
               . " into your browser.  You will then be registered and will receive your password. ";
 $lang['email_problem'] ="A problem occurred in sending your confirmation link to your email address. You might try again later.";

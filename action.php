@@ -80,7 +80,10 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
           }
         
         if(!$this->captcha_succeeded()) {
-            ptln('<div class="error">'.$this->getLang('captcha_failed').'</div>');
+            if ($this->captcha == 'builtin') {
+                echo '<div class="error">'.$this->getLang('cards_nomatch').'</div>';
+            }
+            
             return;
         }
          
