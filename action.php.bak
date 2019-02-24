@@ -19,7 +19,6 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
      */
     private $metaFn;
     private $captcha;
-	private $local;
     
     function register(Doku_Event_Handler $controller){
             $controller->register_hook('HTML_REGISTERFORM_OUTPUT', 'BEFORE', $this, 'update_register_form');
@@ -46,19 +45,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     
         
    function allow_preregister_check(&$event, $param) {
-    $act = $this->_act_clean($event->data); 
-    if($act=='register') {
-        $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);	  
-		$domain = trim($this->getConf('restricted'));
-		
-        if($domain &&!preg_match("/$domain/",$hostname)) {	   
-	     msg('registrations restricted');
-         $event->data='show';		 
-         return;	
-	    }
-		$this->local = true;		
-		return;
-	}	
+    $act = $this->_act_clean($event->data);    
     if($act != 'preregistercheck') return; 
     $event->preventDefault();
   }
@@ -141,8 +128,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         if($_SERVER['REMOTE_USER']){
             return;
         }
-		
-        if($this->local) return;
+      
         $event->data->_hidden['save'] = 0;
         $event->data->_hidden['do'] = 'preregistercheck';
  
