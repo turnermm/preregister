@@ -50,8 +50,10 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     if($act=='register') {
         $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);	  
 		$domain = trim($this->getConf('restricted'));
+                $domain = str_replace(',','|',$domain); 
+                $domain = preg_replace("\s+/","",$domain);  
 		
-        if($domain &&!preg_match("/$domain/",$hostname)) {	   
+        if($domain &&!preg_match("/($domain)/",$hostname)) {	   
 	     msg('registrations restricted');
          $event->data='show';		 
          return;	
