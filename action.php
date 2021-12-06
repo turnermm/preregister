@@ -153,7 +153,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         else {
             $pos = $form->findPositionByAttribute('type','submit');
             $form->removeElement($pos);
-            $button = $form->addButton('','pregister');
+            $button = $form->addButton('preregister','submit');
             $button->attrs(['type' => 'submit','value'=>'Submit']);            
         }        
  
