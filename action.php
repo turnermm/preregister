@@ -21,6 +21,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
     private $captcha;
     
     function register(Doku_Event_Handler $controller){
+            $controller->register_hook('FORM_REGISTER_OUTPUT', 'BEFORE', $this, 'update_register_form');
             $controller->register_hook('HTML_REGISTERFORM_OUTPUT', 'BEFORE', $this, 'update_register_form');
             $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE',  $this, 'allow_preregister_check');
             $controller->register_hook('TPL_ACT_UNKNOWN', 'BEFORE',  $this, 'process_preregister_check');     
@@ -128,10 +129,18 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
         if($_SERVER['REMOTE_USER']){
             return;
         }
-      
+        $form = $event->data;
+        $form_update = false;
+        if(is_a($form,\dokuwiki\Form\Form::class)) {
+            $form_update = true;
+            $form->setHiddenField('save', 0); 
+            $form->setHiddenField('do', 'preregistercheck');            
+        }
+        else {
         $event->data->_hidden['save'] = 0;
         $event->data->_hidden['do'] = 'preregistercheck';
- 
+        }
+        if(!$form_update) {
         for($i=0; $i <count($event->data->_content); $i++) {
             if(isset($event->data->_content[$i]['type']) && $event->data->_content[$i]['type'] == 'submit') 
             {   
@@ -139,15 +148,33 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
                 break; 
             }
         }    
-        $pos = $event->data->findElementByAttribute('type','submit');       
+        }
+      
+        else {
+            $pos = $form->findPositionByAttribute('type','submit');
+            $form->removeElement($pos);
+            $button = $form->addButton('','pregister');
+            $button->attrs(['type' => 'submit','value'=>'Submit']);            
+        }        
+ 
+        if($form_update) {
+            $pos = $form->findPositionByAttribute('type','submit'); 
+        }
+        else $pos = $event->data->findElementByAttribute('type','submit');     
         if(!$pos) return; // no button -> source view mode
         if($this->captcha == 'builtin') {        
             $cards = $this-> get_cards();
             $sel ="";
             $out = $this->format_cards($cards,$sel);                
+            if($form_update) {
+                  $form->setHiddenField('sel',implode("",$sel));
+                  $form->addHTML($out,$pos++);
+            }                
+            else { 
             $event->data->_hidden['sel'] = implode("",$sel);      
            $event->data->insertElement($pos++,$out);
         }   
+    }
     }
     
 
