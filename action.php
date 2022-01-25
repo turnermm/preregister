@@ -310,7 +310,7 @@ function is_user($uname) {
     $uname = utf8_strtolower($uname);
     foreach($users as $line) {
         $line = trim($line);
-        if($line{0} == '#') continue;
+        if($line[0] == '#') continue;
         list($user,$rest) = preg_split('/:/',$line,2);
         if(!trim($user)) continue;
         if($uname == $user) {
