@@ -125,58 +125,65 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
           io_saveFile($this->metaFn,serialize($data));
     }
   
-    function update_register_form(&$event, $param) {    
-        if($_SERVER['REMOTE_USER']){
+    function update_register_form(&$event, $param) {   
+        global $lang;
+
+        if ($_SERVER['REMOTE_USER']) {
             return;
         }
+
         $form = $event->data;
         $form_update = false;
-        if(is_a($form,\dokuwiki\Form\Form::class)) {
+
+        if (is_a($form, \dokuwiki\Form\Form::class)) {
             $form_update = true;
             $form->setHiddenField('save', 0); 
             $form->setHiddenField('do', 'preregistercheck');            
+        } else {
+            $event->data->_hidden['save'] = 0;
+            $event->data->_hidden['do'] = 'preregistercheck';
         }
-        else {
-        $event->data->_hidden['save'] = 0;
-        $event->data->_hidden['do'] = 'preregistercheck';
-        }
-        if(!$form_update) {
-        for($i=0; $i <count($event->data->_content); $i++) {
-            if(isset($event->data->_content[$i]['type']) && $event->data->_content[$i]['type'] == 'submit') 
-            {   
-                $event->data->_content[$i]['value'] = 'Submit';
-                break; 
+
+        if (!$form_update) {
+            for ($i = 0; $i < count($event->data->_content); $i++) {
+                if (isset($event->data->_content[$i]['type']) && $event->data->_content[$i]['type'] == 'submit') {
+                    $event->data->_content[$i]['value'] = 'Submit';
+                    break;
+                }
             }
-        }    
-        }
-      
-        else {
-            $pos = $form->findPositionByAttribute('type','submit');
+        } else {
+            $pos = $form->findPositionByAttribute('type', 'submit');
             $form->removeElement($pos);
-            $button = $form->addButton('preregister','submit');
-            $button->attrs(['type' => 'submit','value'=>'Submit']);            
+            $button = $form->addButton('preregister', $lang['btn_register']);
+            $button->attrs([
+                'type' => 'submit',
+                'value' =>'Submit'
+            ]);            
         }        
  
-        if($form_update) {
-            $pos = $form->findPositionByAttribute('type','submit'); 
+        if ($form_update) {
+            $pos = $form->findPositionByAttribute('type', 'submit'); 
+        } else {
+            $pos = $event->data->findElementByAttribute('type', 'submit');
         }
-        else $pos = $event->data->findElementByAttribute('type','submit');     
-        if(!$pos) return; // no button -> source view mode
-        if($this->captcha == 'builtin') {        
+
+        if (!$pos) {
+            return; // no button -> source view mode
+        }
+
+        if ($this->captcha == 'builtin') {
             $cards = $this-> get_cards();
-            $sel ="";
-            $out = $this->format_cards($cards,$sel);                
-            if($form_update) {
-                  $form->setHiddenField('sel',implode("",$sel));
-                  $form->addHTML($out,$pos++);
-            }                
-            else { 
-            $event->data->_hidden['sel'] = implode("",$sel);      
-           $event->data->insertElement($pos++,$out);
-        }   
+            $sel = "";
+            $out = $this->format_cards($cards, $sel);
+            if ($form_update) {
+                  $form->setHiddenField('sel', implode("", $sel));
+                  $form->addHTML($out, $pos++);
+            } else {
+                $event->data->_hidden['sel'] = implode("", $sel);
+                $event->data->insertElement($pos++, $out);
+            }
+        }
     }
-    }
-    
 
     function process_registration($index) {
 
@@ -235,26 +242,58 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
          return $act;
      }
      
-    function format_cards($cards,&$sel) {
-        $sel = array_slice($cards,0,3);
+    function format_cards($cards, &$sel) {
+        // Get 3 random cards
+        $sel = array_slice($cards, 0, 3);
+
+        // Shuffle cards
         shuffle($cards);
-        $new_row = (int)(count($cards)/2);
-        $out = $sel[0] . '&nbsp;&nbsp;' . $sel[1] . '&nbsp;&nbsp;' . $sel[2] . '<br />';
-        $out = str_replace(array('H','S','D','C'),array('&#9829;','&#9824;','&#9830;','&#9827;'),$out);
-        $out = $this->getLang('check_matching'). '<br />' . $out;
-        $out .= '<center><table cellspacing="2"><tr>';
-        $i=0;
+        // Get how much cards to have per row
+        $new_row = (int) floor(count($cards) / 2);
+
+        // Start to generate output
+        $out = '<div class="no plugin-preregister">';
+        $out .= '<fieldset>';
+        $out .= '<div>' . $this->getLang('check_matching') . '</div>';
+
+        // Show cards
+        $out .= '<div class="captcha_cards">';
+        foreach ($sel as $card) {
+            $card = $this->translate_card($card);
+            $out .= "<span class='captcha_card'>{$card}</span>";
+        }
+        $out .= '</div>';
+
+        $out .= '<table><tr>';
+
+        $i = 0;
+        // Display card rows to chose from
         foreach($cards as $card) {
             $i++;
+
             $name = 'card[]'; 
+            $card = $this->translate_card($card);
             
-            $out .= '<td>' . str_replace(array('H','S','D','C'),array('&#9829;','&#9824;','&#9830;','&#9827;'),$card)
-                    . " <input type = 'checkbox' name = '$name' value = '$card' /></td>"; 
-            if($i==$new_row) $out .='</tr><tr>';        
+            $out .= "
+                <td>
+                    <label>
+                        <span class='captcha_card'>{$card}</span>
+                        <input type='checkbox' name='{$name}' value='{$card}' />
+                    </label>
+                </td>
+            ";
+
+            if ($i === $new_row) {
+                $out .= '</tr><tr>';
+            }
         }
-        $out .= '</tr></table></center>';
+
+        $out .= '</tr></table>';
+        $out .= '</fieldset>';
+        $out .= '</div>';
+
         return $out;
-   }    
+   }
    
     function get_cards() {       
          for($i=1; $i<14; $i++) {
@@ -280,7 +319,14 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
      shuffle($deck);
       return array_slice($deck,0,10);
     }
-    
+
+    function translate_card($card) {
+        return str_replace(
+            ['H', 'S', 'D', 'C'],
+            ['&nbsp;&#9829;', '&nbsp;&#9824;', '&nbsp;&#9830;', '&nbsp;&#9827;'],
+            $card
+        );
+    }
     
     function send_link($email, $url, &$valid_email) {  
         
