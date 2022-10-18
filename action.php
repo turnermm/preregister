@@ -19,6 +19,7 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
      */
     private $metaFn;
     private $captcha;
+    private $captchaPlugins = array('none', 'builtin', 'captcha', 'recaptcha2');
     
     function register(Doku_Event_Handler $controller){
             $controller->register_hook('FORM_REGISTER_OUTPUT', 'BEFORE', $this, 'update_register_form');
@@ -37,11 +38,15 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
          global $ACT;
          if($ACT !== 'register') return;        
          
-         if($this->captcha == 'none' || $this->captcha == 'builtin')  { 
-            ptln( "\n<style type='text/css'>\n   /*<![CDATA[*/");
+         if($this->captcha != 'captcha') {
+            ptln("\n<style type='text/css'>\n   /*<![CDATA[*/");
             ptln("#plugin__captcha_wrapper{ display:none; }\n   /*]]>*/\n</style>");
-         }   
-
+         }
+         
+         if($this->captcha != 'recaptcha2') {
+            ptln("\n<style type='text/css'>\n   /*<![CDATA[*/");
+            ptln("div.g-recaptcha{ display:none !important; }\n   /*]]>*/\n</style>");
+         }
     }    
     
         
@@ -74,32 +79,17 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
              msg('missing Real Name: please fill out all fields');
             return;
           }
-
-        if($this->captcha =='captcha') {         
-            $captcha = $this->loadHelper('captcha', true);
-            if(!$captcha->check()) {
-               return;
+        
+        if(!$this->captcha_succeeded()) {
+            if ($this->captcha == 'builtin') {
+                echo '<div class="error">'.$this->getLang('cards_nomatch').'</div>';
             }
+            
+            return;
         }
          
-         if($this->is_user($_REQUEST['login']))  return;  // name already taken
-         if($this->captcha == 'builtin') {
-             $failed = false;
-             if(!isset($_REQUEST['card'])) {
-               echo '<h4>'. $this->getLang('cards_nomatch') . '</h4>';
-               return;
-             }
-             foreach($_REQUEST['card'] as $card) {          
-                 if(strpos($_REQUEST['sel'],$card) === false) {
-                     $failed = true;
-                     break;                
-                 }
-              }
-             if($failed) {    
-                 echo '<h4>'. $this->getLang('cards_nomatch') . '</h4>';
-                 return;
-            }
-        }
+        if($this->is_user($_REQUEST['login']))  return;  // name already taken
+        
         $t = time();
         $salt =  auth_cookiesalt();       
         $index = md5(microtime() .  $salt);
@@ -124,7 +114,33 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
           $data[$index]['savetime'] = $t;
           io_saveFile($this->metaFn,serialize($data));
     }
-  
+    
+    function captcha_succeeded() {
+        $success = false;
+        
+        if($this->captcha == 'none') {
+            $success = true;
+        }
+        else if($this->captcha == 'builtin' && isset($_REQUEST['card'])) {
+            $success = true;
+            
+            foreach($_REQUEST['card'] as $card) {
+                if(strpos($_REQUEST['sel'], $card) === false) {
+                    $success = false;
+                    break;
+                }
+            }
+        }
+        else if($this->captcha == 'captcha') {
+            $success = $this->loadHelper('captcha', true)->check();
+        }
+        else if($this->captcha == 'recaptcha2') {
+            $success = $this->loadHelper('recaptcha2', true)->check()->isSuccess();
+        }
+        
+        return $success;
+    }
+    
     function update_register_form(&$event, $param) {    
         if($_SERVER['REMOTE_USER']){
             return;
@@ -194,26 +210,26 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
            }
           
     }
-
- 
+    
     function check_captcha_selection() {
-       $list = plugin_list();
-       $this->captcha = $this->getConf('captcha');     
-       if(!in_array('captcha', $list)) {
-           if(preg_match("/captcha/", $this->captcha)) {                           
-               $this->captcha = 'builtin';
-           }
-           return;
-       }    
-       if($this->captcha == 'none' || $this->captcha == 'builtin')  { 
-           return;
-       }
-      if(plugin_isdisabled('captcha')) {
-          $this->captcha = 'builtin';
-          return;             
-      }
-      $this->captcha ='captcha';     
-       
+        $pattern = "/(?<selection>" . join("|", $this->captchaPlugins) . ")/";
+        
+        if(preg_match($pattern, $this->getConf('captcha'), $matches))
+        {
+            $this->captcha = $matches['selection'];
+            
+            if($this->captcha == 'none' || $this->captcha == 'builtin')  {
+                return;
+            }
+            
+            $installedPlugins = plugin_list();
+            if(in_array($this->captcha, $installedPlugins) && !plugin_isdisabled($this->captcha)) {
+                return;
+            }
+        }
+        
+        // Plugin was disabled or bad config value; default to 'builtin'
+        $this->captcha ='builtin';
     }
     
     /**
