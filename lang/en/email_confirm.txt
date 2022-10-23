@@ -1,0 +1,3 @@
+Either click on this link or paste it into your browser to complete your registration:
+
+@URL@

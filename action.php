@@ -289,9 +289,8 @@ class action_plugin_preregister extends DokuWiki_Action_Plugin {
              $valid_email = false;
              return false; 
         } 
-     
-        $text = $this->getLang('email_confirm')  . "\n\n";
-        $text .= "@URL@\n\n";      
+
+        $text = io_readFile($this->localFN('email_confirm'));
         $subject =$this->getLang('subject_confirm');
         
         $mail = new Mailer();
